@@ -12,18 +12,22 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
         public PointerEventData pointerEventData;
         public Card card;
     }
+
+    public delegate void CardInteractionEvent(Card card, PointerEventData pointerData);
+
     
-    public event EventHandler<CardInteractionEventArgs> OnPointerDownEvent;
-    public event EventHandler<CardInteractionEventArgs> OnPointerUpEvent;
-    public event EventHandler<CardInteractionEventArgs> OnDragEvent;
-    public event EventHandler<CardInteractionEventArgs> OnBeginDragEvent;
-    public event EventHandler<CardInteractionEventArgs> OnEndDragEvent;
-    public event EventHandler<CardInteractionEventArgs> OnPointerEnterEvent;
-    public event EventHandler<CardInteractionEventArgs> OnPointerExitEvent;
+    public static event CardInteractionEvent OnPointerDownEvent;
+    public static event CardInteractionEvent OnPointerUpEvent;
+    public static event CardInteractionEvent OnDragEvent;
+    public static event CardInteractionEvent OnBeginDragEvent;
+    public static event CardInteractionEvent OnEndDragEvent;
+    public static event CardInteractionEvent OnPointerEnterEvent;
+    public static event CardInteractionEvent OnPointerExitEvent;
 
     public bool isDragging = false;
 
     public GameObject currentSlot = null;
+    public HorizontalCardHolder currentHolder = null;
     public int parentIndex = 0;
     public bool isSelected = false;
     public float selectionOffset = 1f;
@@ -47,40 +51,40 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     #region Selectable Events
     public void OnPointerDown(PointerEventData eventData)
     {
-        OnPointerDownEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData, card = this }) ;
+        OnPointerDownEvent?.Invoke(this, eventData) ;
         isDragging = true;
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        OnPointerUpEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData, card = this });
+        OnPointerUpEvent?.Invoke(this, eventData);
         handleOnPointerUp();
         isDragging = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        OnDragEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData , card = this });
+        OnDragEvent?.Invoke(this, eventData);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        OnBeginDragEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData , card = this });
+        OnBeginDragEvent?.Invoke(this, eventData);
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        OnEndDragEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData , card = this });
+        OnEndDragEvent?.Invoke(this, eventData);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        OnPointerEnterEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData , card = this });
+        OnPointerEnterEvent?.Invoke(this, eventData);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        OnPointerExitEvent?.Invoke(this, new CardInteractionEventArgs { pointerEventData = eventData , card = this });
+        OnPointerExitEvent?.Invoke(this, eventData);
     }
     #endregion
 

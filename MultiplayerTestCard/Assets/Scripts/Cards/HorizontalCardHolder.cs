@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class HorizontalCardHolder : MonoBehaviour
 {
@@ -14,6 +16,18 @@ public class HorizontalCardHolder : MonoBehaviour
     public List<Card> currentCards = new List<Card>();
 
     public bool isCrossing = false;
+
+    private void OnEnable()
+    {
+        Card.OnPointerEnterEvent += cardPointerEnter;
+        Card.OnBeginDragEvent += beginDrag;
+    }
+
+    private void OnDisable()
+    {
+        Card.OnPointerEnterEvent -= cardPointerEnter;
+        Card.OnBeginDragEvent -= beginDrag;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -51,22 +65,22 @@ public class HorizontalCardHolder : MonoBehaviour
     }
 
 
-    private void beginDrag(object sender, Card.CardInteractionEventArgs e)
+    private void beginDrag(Card card, PointerEventData pointerData)
     {
-        pickedCard = e.card;
+        pickedCard = card;
     }
 
-    void endDrag(object sender, Card.CardInteractionEventArgs e)
+    void endDrag(Card card)
     {
         pickedCard = null;
     }
 
-    void cardPointerEnter(object sender, Card.CardInteractionEventArgs e)
+    void cardPointerEnter(Card card, PointerEventData pointerData)
     {
-        hoveredCard = e.card;
+        hoveredCard = card;
     }
 
-    void cardPointerExit(object sender, Card.CardInteractionEventArgs e)
+    void cardPointerExit(Card card, PointerEventData pointerData)
     {
         hoveredCard = null;
     }
@@ -110,10 +124,34 @@ public class HorizontalCardHolder : MonoBehaviour
     {
         cardSlots.Add(slot);
         card.currentSlot = slot;
+        slot.GetComponent<CardSlot>().card = card;
         card.parentIndex = cardSlots.IndexOf(slot);
-        card.OnPointerEnterEvent += cardPointerEnter;
-        card.OnBeginDragEvent += beginDrag;
-
         currentCards.Add(card);
+        card.currentHolder = this;
+    }
+
+    public Card removeCard(CardSlot slot)
+    {
+        Card cardToRemove = slot.GetComponent<CardSlot>().getCard();
+        cardToRemove.currentSlot = null;
+        cardToRemove.currentHolder = null;
+        slot.GetComponent<CardSlot>().card = null;
+        cardSlots.Remove(slot.gameObject);
+        return cardToRemove;
+    }
+
+    public void sendToOtherHolder(HorizontalCardHolder holder, Card card)
+    {
+        removeCard(card.currentSlot.GetComponent<CardSlot>());
+        holder.receiveCard(card);
+    }
+
+    public void receiveCard(Card card)
+    {
+        GameObject slot = GameObject.Instantiate(SlotPrefab, transform);
+        card.gameObject.transform.SetParent(slot.transform, false);
+        addCard(card, slot);
+        card.GetComponent<Selectable>().enabled = true;
+        card.cardVisual.GetComponent<Image>().enabled = true;
     }
 }

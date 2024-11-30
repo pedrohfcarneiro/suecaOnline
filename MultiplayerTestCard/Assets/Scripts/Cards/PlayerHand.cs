@@ -6,7 +6,15 @@ public class PlayerHand : MonoBehaviour
 {
     [SerializeField] private HorizontalCardHolder cardHolder = null;
 
+    public CardPile cardPile;
+
     public HorizontalCardHolder GetCardHolder() { return cardHolder; }
+
+    [SerializeField] HorizontalCardHolder slot1;
+
+    [SerializeField] HorizontalCardHolder slot2;
+
+    [SerializeField] HorizontalCardHolder slot3;
 
     public List<Card> getCards
     {
@@ -20,6 +28,7 @@ public class PlayerHand : MonoBehaviour
     private void Awake()
     {
         cardHolder = GetComponent<HorizontalCardHolder>();
+        cardPile = GetComponent<CardPile>();
     }
 
     // Start is called before the first frame update

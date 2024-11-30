@@ -34,7 +34,7 @@ public class CardsManager : MonoBehaviour
     [SerializeField] private int cardsToSpawn = 1;
     public GameObject cardPrefab;
     public GameObject cardVisualPrefab;
-    public GameObject drawPile;
+    public CardPile drawPile;
 
     [Header("Cards Textures")]
     public List<Sprite> clubsTextures = new List<Sprite>();
@@ -59,6 +59,7 @@ public class CardsManager : MonoBehaviour
     {
         //spawnCardsTest();
         createDeckCards();
+        initializeDrawPile();
     }
 
     // Update is called once per frame
@@ -112,6 +113,18 @@ public class CardsManager : MonoBehaviour
         moveCardToHand(allCards[0]);
     }
 
+    public void draw()
+    {
+        Card cardToDraw = drawPile.popCard();
+        drawPile.sendCardTo(playerHand.cardPile, cardToDraw);
+        moveCardToHand(cardToDraw);
+    }
+
+    private void initializeDrawPile()
+    {
+        drawPile.initialize(allCards);
+    }
+
     private void createDeckCards()
     {
         for(int i = 0; i < 4; i++)
@@ -120,7 +133,7 @@ public class CardsManager : MonoBehaviour
             {
                 int naipe = i;
                 int numb = j;
-                Card card = spawnCard((CardNaipe)i, (CardNumber)j, false, drawPile);
+                Card card = spawnCard((CardNaipe)i, (CardNumber)j, false, drawPile.gameObject);
                 allCards.Add(card);
             }
         }

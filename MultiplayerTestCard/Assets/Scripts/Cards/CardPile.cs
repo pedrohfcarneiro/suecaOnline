@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CardPile : MonoBehaviour
 {
+    [SerializeField] protected List<Card> cards = new List<Card>();
+
     // Start is called before the first frame update
     void Start()
     {
@@ -14,5 +16,31 @@ public class CardPile : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void initialize(List<Card> cards)
+    {
+        cards.ForEach(card =>
+        {
+            this.cards.Add(card);
+        });
+    }
+
+    public Card popCard()
+    {
+        Card poppedCard = cards[cards.Count-1];
+        cards.RemoveAt(cards.Count - 1);
+        return poppedCard;
+    }
+
+    public void ReceiveCard(Card receivedCard)
+    {
+        this.cards.Add(receivedCard);
+    }
+
+    public void sendCardTo(CardPile cardPile, Card cardToSend)
+    {
+        this.cards.Remove(cardToSend);
+        cardPile.ReceiveCard(cardToSend);
     }
 }
