@@ -36,7 +36,6 @@ public class DropableArea : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
         if(card != null)
         {
-            Debug.Log(card);
             onDropedCard?.Invoke(card, pointerData);
         }
     }

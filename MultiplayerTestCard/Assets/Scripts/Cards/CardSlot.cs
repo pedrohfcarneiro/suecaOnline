@@ -34,6 +34,7 @@ public class CardSlot : MonoBehaviour
 
     public void handleDropedCard(Card card, PointerEventData pointerData)
     {
+        Debug.Log(card.number);
         if(GetComponent<HorizontalCardHolder>() != card.currentHolder)
         {
             card.currentHolder.sendToOtherHolder(GetComponent<HorizontalCardHolder>(), card);

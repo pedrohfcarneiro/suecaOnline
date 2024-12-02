@@ -4,31 +4,32 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
+public enum CardNaipe
+{
+    Clubs,
+    Hearts,
+    Diamonds,
+    Spades
+}
+public enum CardNumber
+{
+    AS,
+    DOIS,
+    TRES,
+    QUATRO,
+    CINCO,
+    SEIS,
+    SETE,
+    OITO,
+    NOVE,
+    DEZ,
+    VALETE,
+    DAMA,
+    REI
+}
+
 public class CardsManager : MonoBehaviour
 {
-    public enum CardNaipe
-    {
-        Clubs,
-        Hearts,
-        Diamonds,
-        Spades
-    }
-    public enum CardNumber
-    {
-        AS,
-        DOIS,
-        TRES,
-        QUATRO,
-        CINCO,
-        SEIS,
-        SETE,
-        OITO,
-        NOVE,
-        DEZ,
-        VALETE,
-        DAMA,
-        REI
-    }
 
     [SerializeField] private PlayerHand playerHand;
     [SerializeField] private int cardsToSpawn = 1;
@@ -68,13 +69,14 @@ public class CardsManager : MonoBehaviour
         
     }
 
+    //TODO: use virtual cards
     public void spawnCardsTest()
     {
         for(int i = 0; i < cardsToSpawn; i++)
         {
             GameObject slot = GameObject.Instantiate(playerHand.GetComponent<HorizontalCardHolder>().SlotPrefab, playerHand.transform);
-            int randNaipe = Random.Range(1, 4);
-            int randNumb = Random.Range(1, 13);
+            int randNaipe = Random.Range(0, 3);
+            int randNumb = Random.Range(0, 12);
             Card card = spawnCard((CardNaipe) randNaipe, (CardNumber) randNumb, true, slot);
             playerHand.GetCardHolder().addCard(card, slot);
         }
@@ -84,6 +86,8 @@ public class CardsManager : MonoBehaviour
     {
         GameObject cardGO = GameObject.Instantiate(cardPrefab, parent.transform);
         Card card = cardGO.GetComponent<Card>();
+        card.naipe = cardNaipe;
+        card.number = cardNumberToEnum;
         card.GetComponent<Selectable>().enabled = isActive;
 
         //spawn visual

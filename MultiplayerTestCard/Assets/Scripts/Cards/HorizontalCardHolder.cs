@@ -21,12 +21,14 @@ public class HorizontalCardHolder : MonoBehaviour
     {
         Card.OnPointerEnterEvent += cardPointerEnter;
         Card.OnBeginDragEvent += beginDrag;
+        Card.OnPointerUpEvent += cardDrop;
     }
 
     private void OnDisable()
     {
         Card.OnPointerEnterEvent -= cardPointerEnter;
         Card.OnBeginDragEvent -= beginDrag;
+        Card.OnPointerUpEvent -= cardDrop;
     }
 
     // Start is called before the first frame update
@@ -45,6 +47,7 @@ public class HorizontalCardHolder : MonoBehaviour
             {
                 if (pickedCard.transform.position.x > currentCards[i].transform.position.x)
                 {
+                    Debug.Log(currentCards[i].number);
                     if (pickedCard.parentIndex < currentCards[i].parentIndex)
                     {
                         swap(i);
@@ -54,6 +57,7 @@ public class HorizontalCardHolder : MonoBehaviour
 
                 if (pickedCard.transform.position.x < currentCards[i].transform.position.x)
                 {
+                    Debug.Log(currentCards[i].number);
                     if (pickedCard.parentIndex > currentCards[i].parentIndex)
                     {
                         swap(i);
@@ -67,22 +71,34 @@ public class HorizontalCardHolder : MonoBehaviour
 
     private void beginDrag(Card card, PointerEventData pointerData)
     {
-        pickedCard = card;
+        if(card.currentHolder == this)
+        {
+            pickedCard = card;
+        }
     }
 
-    void endDrag(Card card)
+    void cardDrop(Card card, PointerEventData pointerData)
     {
-        pickedCard = null;
+        if (card.currentHolder == this)
+        {
+            pickedCard = null;
+        }
     }
 
     void cardPointerEnter(Card card, PointerEventData pointerData)
     {
-        hoveredCard = card;
+        if (card.currentHolder == this)
+        {
+            hoveredCard = card;
+        }
     }
 
     void cardPointerExit(Card card, PointerEventData pointerData)
     {
-        hoveredCard = null;
+        if (card.currentHolder == this)
+        {
+            hoveredCard = null;
+        }
     }
 
     public void swap(int index)
@@ -109,6 +125,13 @@ public class HorizontalCardHolder : MonoBehaviour
         pickedCard.parentIndex = currentCards[index].parentIndex;
         currentCards[index].parentIndex = previousPickedParentIndex;
 
+        GameObject previousPickedCardSlot = pickedCard.currentSlot;
+        pickedCard.currentSlot = currentCards[index].currentSlot;
+        currentCards[index].currentSlot = previousPickedCardSlot;
+
+        previousPickedCardSlot.GetComponent<CardSlot>().card = currentCards[index];
+        pickedCard.currentSlot.GetComponent<CardSlot>().card = pickedCard;
+
         isCrossing = false;
 
         //getCards[index].cardVisual.swap(swapToRight ? -1 : 1);
@@ -132,24 +155,41 @@ public class HorizontalCardHolder : MonoBehaviour
 
     public Card removeCard(CardSlot slot)
     {
+        Debug.Log(slot.GetComponent<CardSlot>().getCard().number);
         Card cardToRemove = slot.GetComponent<CardSlot>().getCard();
         cardToRemove.currentSlot = null;
         cardToRemove.currentHolder = null;
         slot.GetComponent<CardSlot>().card = null;
         cardSlots.Remove(slot.gameObject);
+        Destroy(slot.gameObject);
+        currentCards.Remove(cardToRemove);
+        //Debug.Log(currentCards.ToArray());
+
+        //update cards parent indexes
+        currentCards.ForEach((Card card) =>
+        {
+            card.parentIndex = cardSlots.IndexOf(card.currentSlot);
+        });
         return cardToRemove;
     }
 
     public void sendToOtherHolder(HorizontalCardHolder holder, Card card)
     {
+        pickedCard = null;
+        //Debug.Log(card.number, card.currentSlot.GetComponent<CardSlot>().getCard());
         removeCard(card.currentSlot.GetComponent<CardSlot>());
         holder.receiveCard(card);
+        holder.currentCards.ForEach((Card card) =>
+        {
+            card.parentIndex = holder.cardSlots.IndexOf(card.currentSlot);
+        });
     }
 
     public void receiveCard(Card card)
     {
         GameObject slot = GameObject.Instantiate(SlotPrefab, transform);
         card.gameObject.transform.SetParent(slot.transform, false);
+        card.parentIndex = 0;
         addCard(card, slot);
         card.GetComponent<Selectable>().enabled = true;
         card.cardVisual.GetComponent<Image>().enabled = true;

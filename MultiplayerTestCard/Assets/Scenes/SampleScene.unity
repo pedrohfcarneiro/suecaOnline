@@ -187,8 +187,7 @@ MonoBehaviour:
   pickedCard: {fileID: 0}
   hoveredCard: {fileID: 0}
   SlotPrefab: {fileID: 8361329777586597483, guid: 999283083d4b08f4584e9cb2af3fd9f8, type: 3}
-  cardSlots:
-  - {fileID: 0}
+  cardSlots: []
   currentCards: []
   isCrossing: 0
 --- !u!114 &293082863
@@ -270,6 +269,7 @@ GameObject:
   - component: {fileID: 343605577}
   - component: {fileID: 343605576}
   - component: {fileID: 343605581}
+  - component: {fileID: 343605582}
   m_Layer: 5
   m_Name: slot1
   m_TagString: Untagged
@@ -324,8 +324,7 @@ MonoBehaviour:
   pickedCard: {fileID: 0}
   hoveredCard: {fileID: 0}
   SlotPrefab: {fileID: 8361329777586597483, guid: 999283083d4b08f4584e9cb2af3fd9f8, type: 3}
-  cardSlots:
-  - {fileID: 0}
+  cardSlots: []
   currentCards: []
   isCrossing: 0
 --- !u!114 &343605578
@@ -404,6 +403,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 318501355d17b46aebb770e22b4327a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &343605582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 343605574}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba16530d2218b4e86a40b4d8277d96bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  card: {fileID: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -564,8 +576,7 @@ MonoBehaviour:
   pickedCard: {fileID: 0}
   hoveredCard: {fileID: 0}
   SlotPrefab: {fileID: 8361329777586597483, guid: 999283083d4b08f4584e9cb2af3fd9f8, type: 3}
-  cardSlots:
-  - {fileID: 0}
+  cardSlots: []
   currentCards: []
   isCrossing: 0
 --- !u!114 &1200931200
@@ -1055,8 +1066,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: abf56d991c0818c45a84988f3c0d4f0d, type: 3}
   - {fileID: 21300000, guid: a4edbf4829c97b0468ba9a4d280f86dc, type: 3}
   - {fileID: 21300000, guid: 197f6c2cacd355f47be5812855039d27, type: 3}
-  - {fileID: 21300000, guid: 461178766c0bfa84d9532d2047b30949, type: 3}
   - {fileID: 21300000, guid: 11667dd7bdabacc4389c200db6fed82d, type: 3}
+  - {fileID: 21300000, guid: 461178766c0bfa84d9532d2047b30949, type: 3}
   heartsTextures:
   - {fileID: 21300000, guid: c3464877d91e5f14698912f71e62f010, type: 3}
   - {fileID: 21300000, guid: 4c716662ffac4eb4284dd5ab40fca17b, type: 3}
@@ -1069,8 +1080,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4a163656bebf38a4aad461b0b8a6bfb8, type: 3}
   - {fileID: 21300000, guid: 793b030568ffdd44492d642e809bd741, type: 3}
   - {fileID: 21300000, guid: d5735a938e98a424ab8362ea06e34bf6, type: 3}
-  - {fileID: 21300000, guid: 6a56267b0f06b034e80fe7d5480b3241, type: 3}
   - {fileID: 21300000, guid: 37a84df55476a5b499be69fc97bbf002, type: 3}
+  - {fileID: 21300000, guid: 6a56267b0f06b034e80fe7d5480b3241, type: 3}
   diamondsTextures:
   - {fileID: 21300000, guid: 77d6ca990f10a1145936681388816315, type: 3}
   - {fileID: 21300000, guid: f3a5ff3ed3916f6419cd7c3c09740335, type: 3}
@@ -1083,9 +1094,10 @@ MonoBehaviour:
   - {fileID: 21300000, guid: bb7ce2aa81f52254397f8f6f167821f4, type: 3}
   - {fileID: 21300000, guid: 3dad51b29a1078c4cab1f39fd741c8c0, type: 3}
   - {fileID: 21300000, guid: 39c785121f08efa49805f65e4d95223d, type: 3}
-  - {fileID: 21300000, guid: 7b56e4417ccb6c140ad823d9016f3abe, type: 3}
   - {fileID: 21300000, guid: 49a72aef6907d3e469f55c3da1c1131b, type: 3}
+  - {fileID: 21300000, guid: 7b56e4417ccb6c140ad823d9016f3abe, type: 3}
   spadesTextures:
+  - {fileID: 21300000, guid: 5eba6eb7a9b4e2b4a862a9bcedc911c5, type: 3}
   - {fileID: 21300000, guid: 231d6e483470b7040bcaca28b10f0c05, type: 3}
   - {fileID: 21300000, guid: 5739e606c6efcdb49a3e5d5c74afb184, type: 3}
   - {fileID: 21300000, guid: a43b34fb7af5b3d4fbc9c86e44ab193a, type: 3}
@@ -1095,11 +1107,9 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 1237036f787c2b3429581ffcd5e69326, type: 3}
   - {fileID: 21300000, guid: 5bd0fc5095dba434ba15389f76afb23a, type: 3}
   - {fileID: 21300000, guid: 676ef84abba72be44b1184113933de6e, type: 3}
-  - {fileID: 21300000, guid: 5eba6eb7a9b4e2b4a862a9bcedc911c5, type: 3}
-  - {fileID: 21300000, guid: c1e871591d9c3e8459278aec7f6ca905, type: 3}
   - {fileID: 21300000, guid: 57fa542a92696244e990ee11ef4ea840, type: 3}
-  - {fileID: 21300000, guid: 0a1e1494556063b4fa8b04a344a4b3dd, type: 3}
   - {fileID: 21300000, guid: 82d020785c13edf44845a810f42a377e, type: 3}
+  - {fileID: 21300000, guid: 0a1e1494556063b4fa8b04a344a4b3dd, type: 3}
   allCards: []
 --- !u!4 &2040983398
 Transform:

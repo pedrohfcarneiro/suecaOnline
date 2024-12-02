@@ -31,6 +31,8 @@ public class Card : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHand
     public int parentIndex = 0;
     public bool isSelected = false;
     public float selectionOffset = 1f;
+    public CardNaipe naipe = CardNaipe.Clubs;
+    public CardNumber number = CardNumber.AS;
 
     public GameObject cardVisual = null;
 
