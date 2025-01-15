@@ -43,4 +43,9 @@ public class CardPile : MonoBehaviour
         this.cards.Remove(cardToSend);
         cardPile.ReceiveCard(cardToSend);
     }
+
+    public List<Card> getPileCards()
+    {
+        return this.cards;
+    }
 }

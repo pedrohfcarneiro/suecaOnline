@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +30,7 @@ public enum CardNumber
     REI
 }
 
-public class CardsManager : MonoBehaviour
+public class CardsManager : NetworkBehaviour
 {
 
     [SerializeField] private PlayerHand playerHand;
@@ -59,25 +61,32 @@ public class CardsManager : MonoBehaviour
     void Start()
     {
         //spawnCardsTest();
+        if (IsClient) return;
         createDeckCards();
         initializeDrawPile();
+        NetworkObjectReference[] NO_reference_to_send = new NetworkObjectReference[allCards.Count];
+        for (int i = 0; i < allCards.Count; i++)
+        {
+            NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
+        }
+        SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     //TODO: use virtual cards
     public void spawnCardsTest()
     {
-        for(int i = 0; i < cardsToSpawn; i++)
+        for (int i = 0; i < cardsToSpawn; i++)
         {
             GameObject slot = GameObject.Instantiate(playerHand.GetComponent<HorizontalCardHolder>().SlotPrefab, playerHand.transform);
             int randNaipe = Random.Range(0, 3);
             int randNumb = Random.Range(0, 12);
-            Card card = spawnCard((CardNaipe) randNaipe, (CardNumber) randNumb, true, slot);
+            Card card = spawnCard((CardNaipe)randNaipe, (CardNumber)randNumb, true, slot);
             playerHand.GetCardHolder().addCard(card, slot);
         }
     }
@@ -93,7 +102,7 @@ public class CardsManager : MonoBehaviour
         //spawn visual
         GameObject cardVisualGO = GameObject.Instantiate(cardVisualPrefab, card.GetComponentInParent<Canvas>().transform);
         cardVisualGO.transform.position = cardGO.transform.position;
-        cardVisualGO.GetComponent<Image>().sprite = naipeTextureDict[cardNaipe][(int) cardNumberToEnum];
+        cardVisualGO.GetComponent<Image>().sprite = naipeTextureDict[cardNaipe][(int)cardNumberToEnum];
         cardVisualGO.GetComponent<Image>().enabled = isActive;
         CardVisual cardVisual = cardVisualGO.GetComponent<CardVisual>();
         cardVisual.Initialize(card, card.parentIndex);
@@ -101,6 +110,24 @@ public class CardsManager : MonoBehaviour
         card.cardVisual = cardVisualGO;
 
         return card;
+    }
+
+    [ClientRpc]
+    private void SendCardsDataClientRpc(NetworkObjectReference[] allCardsFromServerNO, NetworkObjectReference[] drawPileCardsFromServerNO)
+    {
+        Card[] cardArray = new Card[allCardsFromServerNO.Length];
+        for (int i = 0;i < allCardsFromServerNO.Length;i++)
+        {
+            NetworkObject networkObject;
+            bool gotNetworkObject = allCardsFromServerNO[i].TryGet(out networkObject, GetComponent<NetworkManager>());
+
+            if(gotNetworkObject)
+            {
+                cardArray[i] = networkObject.gameObject.GetComponent<Card>();
+            }
+        }
+        this.allCards = cardArray.ToList<Card>();
+        //this.drawPile.initialize(drawPileCardsFromServer);
     }
 
     public void moveCardToHand(Card card)
