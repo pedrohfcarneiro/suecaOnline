@@ -15,10 +15,20 @@ public class PlayButton : NetworkBehaviour
         playButton.onClick.AddListener(() =>
         {
             Debug.Log("play pressed");
-            if(IsHost)
+            if (IsHost)
             {
                 SceneManager.LoadScene("Gameplay");
+                clientLoadGameplayClientRpc();
             }
         });
+    }
+
+    [ClientRpc]
+    public void clientLoadGameplayClientRpc()
+    {
+        if(IsClient)
+        {
+            SceneManager.LoadScene("Gameplay");
+        }
     }
 }

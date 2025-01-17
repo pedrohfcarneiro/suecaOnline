@@ -51,32 +51,42 @@ public class CardsManager : NetworkBehaviour
 
     private void Awake()
     {
-        playerCardArea.GetComponent<NetworkObject>().Spawn();
+        if (IsServer)
+        {
+            GetComponent<NetworkObject>().Spawn();
+            NetworkBehaviour playerCardAreaNetworkBehaviour = playerCardArea.GetComponent<NetworkBehaviour>();
+            playerCardArea.GetComponent<NetworkObject>().SpawnAsPlayerObject(playerCardAreaNetworkBehaviour.OwnerClientId);
+            naipeTextureDict.Add(CardNaipe.Clubs, clubsTextures);
+            naipeTextureDict.Add(CardNaipe.Hearts, heartsTextures);
+            naipeTextureDict.Add(CardNaipe.Diamonds, diamondsTextures);
+            naipeTextureDict.Add(CardNaipe.Spades, spadesTextures);
+        }
 
-        naipeTextureDict.Add(CardNaipe.Clubs, clubsTextures);
-        naipeTextureDict.Add(CardNaipe.Hearts, heartsTextures);
-        naipeTextureDict.Add(CardNaipe.Diamonds, diamondsTextures);
-        naipeTextureDict.Add(CardNaipe.Spades, spadesTextures);
     }
 
     // Start is called before the first frame update
     void Start()
     {
-        //spawnCardsTest();
-        if (IsClient) return;
-        createDeckCards();
-        initializeDrawPile();
-        NetworkObjectReference[] NO_reference_to_send = new NetworkObjectReference[allCards.Count];
-        for (int i = 0; i < allCards.Count; i++)
-        {
-            NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
-        }
-        SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
+        
     }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
+        //spawnCardsTest();
+        Debug.Log(IsClient);
+        if (IsClient) return;
+        Debug.Log("opa");
+        createDeckCards();
+        initializeDrawPile();
+        NetworkObjectReference[] NO_reference_to_send = new NetworkObjectReference[allCards.Count];
+        Debug.Log(NO_reference_to_send.Length);
+        for (int i = 0; i < allCards.Count; i++)
+        {
+            Debug.Log(allCards[i]);
+            NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
+        }
+        SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
     }
 
     // Update is called once per frame
@@ -100,17 +110,18 @@ public class CardsManager : NetworkBehaviour
 
     public Card spawnCard(CardNaipe cardNaipe, CardNumber cardNumberToEnum, bool isActive, GameObject parent)
     {
-        Debug.Log(parent.transform);
-        GameObject cardGO = GameObject.Instantiate(cardPrefab, parent.transform);
+        GameObject cardGO = GameObject.Instantiate(cardPrefab, playerCardArea.transform);
         cardGO.GetComponent<NetworkObject>().Spawn();
+        cardGO.gameObject.transform.SetParent(playerCardArea.transform);
         Card card = cardGO.GetComponent<Card>();
         card.naipe = cardNaipe;
         card.number = cardNumberToEnum;
         card.GetComponent<Selectable>().enabled = isActive;
 
         //spawn visual
-        GameObject cardVisualGO = GameObject.Instantiate(cardVisualPrefab, card.GetComponentInParent<Canvas>().transform);
-        Debug.Log(cardVisualGO);
+        GameObject cardVisualGO = GameObject.Instantiate(cardVisualPrefab, playerCardArea.transform);
+        cardVisualGO.GetComponent<NetworkObject>().Spawn();
+        cardVisualGO.gameObject.transform.SetParent(playerCardArea.transform);
         cardVisualGO.transform.position = cardGO.transform.position;
         cardVisualGO.GetComponent<Image>().sprite = naipeTextureDict[cardNaipe][(int)cardNumberToEnum];
         cardVisualGO.GetComponent<Image>().enabled = isActive;
@@ -125,6 +136,7 @@ public class CardsManager : NetworkBehaviour
     [ClientRpc]
     private void SendCardsDataClientRpc(NetworkObjectReference[] allCardsFromServerNO, NetworkObjectReference[] drawPileCardsFromServerNO)
     {
+        Debug.Log("teste");
         Card[] cardArray = new Card[allCardsFromServerNO.Length];
         for (int i = 0;i < allCardsFromServerNO.Length;i++)
         {
@@ -174,7 +186,7 @@ public class CardsManager : NetworkBehaviour
             {
                 int naipe = i;
                 int numb = j;
-                Card card = spawnCard((CardNaipe)i, (CardNumber)j, false, drawPile.gameObject);
+                Card card = spawnCard((CardNaipe)i, (CardNumber)j, false, playerCardArea);
                 allCards.Add(card);
             }
         }
