@@ -32,7 +32,7 @@ public enum CardNumber
 
 public class CardsManager : NetworkBehaviour
 {
-
+    [SerializeField] private GameObject playerCardArea;
     [SerializeField] private PlayerHand playerHand;
     [SerializeField] private int cardsToSpawn = 1;
     public GameObject cardPrefab;
@@ -51,6 +51,8 @@ public class CardsManager : NetworkBehaviour
 
     private void Awake()
     {
+        playerCardArea.GetComponent<NetworkObject>().Spawn();
+
         naipeTextureDict.Add(CardNaipe.Clubs, clubsTextures);
         naipeTextureDict.Add(CardNaipe.Hearts, heartsTextures);
         naipeTextureDict.Add(CardNaipe.Diamonds, diamondsTextures);
@@ -70,6 +72,11 @@ public class CardsManager : NetworkBehaviour
             NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
         }
         SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
     }
 
     // Update is called once per frame
@@ -93,7 +100,9 @@ public class CardsManager : NetworkBehaviour
 
     public Card spawnCard(CardNaipe cardNaipe, CardNumber cardNumberToEnum, bool isActive, GameObject parent)
     {
+        Debug.Log(parent.transform);
         GameObject cardGO = GameObject.Instantiate(cardPrefab, parent.transform);
+        cardGO.GetComponent<NetworkObject>().Spawn();
         Card card = cardGO.GetComponent<Card>();
         card.naipe = cardNaipe;
         card.number = cardNumberToEnum;
@@ -101,6 +110,7 @@ public class CardsManager : NetworkBehaviour
 
         //spawn visual
         GameObject cardVisualGO = GameObject.Instantiate(cardVisualPrefab, card.GetComponentInParent<Canvas>().transform);
+        Debug.Log(cardVisualGO);
         cardVisualGO.transform.position = cardGO.transform.position;
         cardVisualGO.GetComponent<Image>().sprite = naipeTextureDict[cardNaipe][(int)cardNumberToEnum];
         cardVisualGO.GetComponent<Image>().enabled = isActive;
