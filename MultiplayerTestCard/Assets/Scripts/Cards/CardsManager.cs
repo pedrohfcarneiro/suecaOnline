@@ -51,16 +51,9 @@ public class CardsManager : NetworkBehaviour
 
     private void Awake()
     {
-        if (IsServer)
-        {
-            GetComponent<NetworkObject>().Spawn();
-            NetworkBehaviour playerCardAreaNetworkBehaviour = playerCardArea.GetComponent<NetworkBehaviour>();
-            playerCardArea.GetComponent<NetworkObject>().SpawnAsPlayerObject(playerCardAreaNetworkBehaviour.OwnerClientId);
-            naipeTextureDict.Add(CardNaipe.Clubs, clubsTextures);
-            naipeTextureDict.Add(CardNaipe.Hearts, heartsTextures);
-            naipeTextureDict.Add(CardNaipe.Diamonds, diamondsTextures);
-            naipeTextureDict.Add(CardNaipe.Spades, spadesTextures);
-        }
+        GetComponent<NetworkObject>().Spawn();
+        NetworkBehaviour playerCardAreaNetworkBehaviour = playerCardArea.GetComponent<NetworkBehaviour>();
+        playerCardArea.GetComponent<NetworkObject>().SpawnAsPlayerObject(playerCardAreaNetworkBehaviour.OwnerClientId);
 
     }
 
@@ -74,19 +67,25 @@ public class CardsManager : NetworkBehaviour
     {
         base.OnNetworkSpawn();
         //spawnCardsTest();
-        Debug.Log(IsClient);
-        if (IsClient) return;
-        Debug.Log("opa");
-        createDeckCards();
-        initializeDrawPile();
-        NetworkObjectReference[] NO_reference_to_send = new NetworkObjectReference[allCards.Count];
-        Debug.Log(NO_reference_to_send.Length);
-        for (int i = 0; i < allCards.Count; i++)
+        Debug.Log(IsServer);
+        if (IsServer)
         {
-            Debug.Log(allCards[i]);
-            NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
+            naipeTextureDict.Add(CardNaipe.Clubs, clubsTextures);
+            naipeTextureDict.Add(CardNaipe.Hearts, heartsTextures);
+            naipeTextureDict.Add(CardNaipe.Diamonds, diamondsTextures);
+            naipeTextureDict.Add(CardNaipe.Spades, spadesTextures);
+
+            createDeckCards();
+            initializeDrawPile();
+            NetworkObjectReference[] NO_reference_to_send = new NetworkObjectReference[allCards.Count];
+            Debug.Log(NO_reference_to_send.Length);
+            for (int i = 0; i < allCards.Count; i++)
+            {
+                Debug.Log(allCards[i]);
+                NO_reference_to_send[i] = new NetworkObjectReference(allCards[i].gameObject);
+            }
+            SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
         }
-        SendCardsDataClientRpc(NO_reference_to_send, NO_reference_to_send);
     }
 
     // Update is called once per frame
